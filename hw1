@@ -1,0 +1,123 @@
+#本周作业
+##作业一
+###本次使用了Rust语言完成本次作业
+####一、代码展示
+```rust
+fn main(){
+    println!("hello 何奥！");
+}
+```
+####二、环境搭建
+1.[Rust官网](https://www.rust-lang.org/tools/install)下载Rust。我这里是 Windows操作系统。因此，安装 Rust，下载并运行程序rustup-init.exe，然后按照控制台提示进行安装即可。安装后在命令行执行 rustc --version 来判断Rust是否安装正确。![](https://img2018.cnblogs.com/blog/76497/201909/76497-20190908212402790-1950325363.png)
+2.cargo 是Rust 的包管理器和构建系统。可以用cargo --version来查看版本，同时可以用命令cargo new 项目名来创建一个新的Rust项目，如下图所示。![](https://img2018.cnblogs.com/blog/76497/201909/76497-20190908212626851-2011934762.png)
+3.打开vscode安装扩展，然后重新打开.
+![](https://exp-picture.cdn.bcebos.com/65390a23beb9763eda6752626ad06de89b61b03e.jpg?x-bce-process=image%2Fresize%2Cm_lfit%2Cw_500%2Climit_1%2Fformat%2Cf_jpg%2Fquality%2Cq_80)
+4.替换源
+（1）找到.cargo目录
+（2）创建config文件，并填充如下内容
+
+    [source.crates-io]
+
+    registry = "https://github.com/rust-lang/crates.io-index"
+
+    replace-with = 'ustc'
+
+    [source.ustc]
+
+    registry = "https://mirrors.ustc.edu.cn/crates.io-index"
+
+    [http]
+
+    check-revoke = false
+5.在vscode打开终端，创建工作目录
+![](https://exp-picture.cdn.bcebos.com/125ed0ecd3d96975560d052dd243040149fe0962.jpg?x-bce-process=image%2Fresize%2Cm_lfit%2Cw_500%2Climit_1%2Fformat%2Cf_jpg%2Fquality%2Cq_80)
+6.打开工作目录
+![](https://exp-picture.cdn.bcebos.com/8974c38a59de4507a0d2d1c45e413a8ca708856b.jpg?x-bce-process=image%2Fresize%2Cm_lfit%2Cw_500%2Climit_1%2Fformat%2Cf_jpg%2Fquality%2Cq_80)
+6.配置调试环境，选择windows环境
+![](https://exp-picture.cdn.bcebos.com/a48bc2e8904800fc6d2d71bad42043715edb9372.jpg?x-bce-process=image%2Fresize%2Cm_lfit%2Cw_500%2Climit_1%2Fformat%2Cf_jpg%2Fquality%2Cq_80)
+7.测试
+![](https://exp-picture.cdn.bcebos.com/c8373cbc7dc5cf67aeb53cf28e96b814f5d02643.jpg?x-bce-process=image%2Fresize%2Cm_lfit%2Cw_500%2Climit_1%2Fformat%2Cf_jpg%2Fquality%2Cq_80)
+##作业二
+####什么是空值
+1.空值，表示没有值。如果一个语言有“空值”，那么任何变量有两种可能：有值，“空值”。
+在Java里，空值用null表示。null是一个特殊的东西，它可以赋值给任何对象，比如一个字符串，一个数组，可以强转成任何类型。null是什么类型？也许可以理解为任意类型，因为它能赋值给任意对象。也可以理解为没有类型，一个不存在的东西，不应该有类型。
+空，是什么都没有。既没有值，也没有类型。乃至，空是不可表达的，哪怕只有一个名字，null，那也会立刻面临一系列的问题。
+1965年Tony Hoare发明null，他在2009年写了一篇文章“Null References: The Billion Dollar Mistake”，称null是错误发明，至少导致十亿美元损失。
+2.空值，象上帝一样，象上梵一样，不可说，不可表达，不可感知。又像禅宗的公案，开口即错，动念即乖。
+所以，取消空值更好，没有空值就没有那么多不确定的麻烦。
+业界发明Option解决这个问题，比如Java 8的 Optional，Scala的Option。
+####Rust中对于空值的处理
+Rust也沿用这种解决方式。
+Rust没有空值，没有null。Rust的None不是空值，是枚举。在Rust，如果一个变量的值可能不存在，需要用Option\<T>封装。
+Option是枚举类型，定义如下：
+```rust
+    enum Option<T> {
+        Some(T),
+        None,
+    }
+```
+那么：
+```rust
+    fn main() {
+        //jj是Option<f64>类型，类型推导可以判断Option<T>的T是f64
+        let ii = Some(15.1);
+        //以unwrap的方式可以计算jj的值，类型推导可以判断jj的类型
+        let jj = ii.unwrap()+3.3;
+        println!("jj = {:?}", jj);
+        //此时，kk是None，None的类型是Option<T>，类型推导无法判断T是什么
+        let kk = None;
+        //因此，会在这里报错：
+        let ll = kk.unwrap()+15.1;
+        //  ^^ consider giving `ll` a type
+        println!("ll = {:?}", ll);
+    }
+```
+因此，在match里，或者其他地方，如果使用可能为不存在的量，都需要判断None，否则无法进行下去。
+Option\<T>的好处如下：
+
+只要用了Option\<T>，编译器就可以很直接地知道你有没有处理None，如果忘记处理，第一时间报错
+如果一个变量的值是None，它啥也做不了，因为编译器不知道T是什么，无法操作
+如果一个变量的值是Some\<T>，可以根据类型T做无歧义的操作，避免风马牛不相及的问题
+比如，对1，下面代码编译时会报错：
+```rust
+ fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            Some(i) => Some(i + 1),
+        }
+    }
+ 
+ fn main(){
+     let x = Some(5);
+     println!("v = {:?}", plus_one(x));
+ 
+ }
+ 
+ /*
+ error[E0004]: non-exhaustive patterns: `None` not covered
+   --> src/main.rs:2:15
+    |
+2   |         match x {
+    |               ^ pattern `None` not covered
+    |
+   ::: /home/brian/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src/libcore/option.rs:157:5
+    |
+157 |     None,
+    |     ---- not covered
+    |
+    = help: ensure that all possible cases are being handled, possibly by adding wildcards or more match arms
+    = note: the matched value is of type `std::option::Option<i32>`
+error: aborting due to previous error
+ */
+```
+Option\<T>可以说是设计模式非常聪明的例子。
+如何使用Option的判断：
+```rust
+
+fn main(){
+    let x = Some(15);
+    let y = x.map_or(false, |s| s == 12);
+    print!("y = {}", y);
+}
+//结果输出：
+// y = false
+```
